@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-4.0.xsd 
+            http://www.springframework.org/schema/context 
+            http://www.springframework.org/schema/context/spring-context.xsd">
+	<context:property-placeholder
+		location="classpath:prop.properties"
+		ignore-unresolvable="true" />
+		
+	<context:component-scan base-package="spring.quartz.dynamic.test.demo" />
+	<!-- 数据源 -->
+	<import resource="classpath:spring-datasource.xml"/>
+	
+	<!-- spring-quartz 调度任务 -->
+	<bean name="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="configLocation" value="classpath:quartz.properties"/>
+		<property name="dataSource" ref="dataSource" />
+		<!-- 事物 -->
+		<property name="transactionManager">
+			<bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+				<property name="dataSource" ref="dataSource" />
+			</bean>
+		</property>
+		<!-- unique 任务名称 ,保存到数据库-->
+		<property name="schedulerName" value="uniqueScheduleName" />
+		
+		<!-- 这是一个集群更新触发器设置，集群中部署新应用的时候，更新触发器 ，更新已存在的job，就不用每次修改job后删除qrtz_job_details表的记录-->
+		<property name="overwriteExistingJobs" value="true"/>
+		<!-- 增加这个属性，Spring会帮我们自动注入applicationContext -->
+		<property name="applicationContextSchedulerContextKey" value="applicationContext" />
+		
+		<!-- job工厂 ,用于对生成job的时候,实现对job内部bean的自动注入-->
+		<property name="jobFactory">
+			<bean class="spring.quartz.dynamic.test.demo.AutowiredInternalBeanJobFactory2"/>
+		</property>
+		
+		
+		<!-- 线程池 -->
+		<property name="taskExecutor">
+			<bean class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+				<property name="corePoolSize" value="5"/>
+				<property name="maxPoolSize" value="10"/>
+				<property name="queueCapacity" value="20"/>
+			</bean>
+		</property>
+		
+	</bean>
+</beans>
