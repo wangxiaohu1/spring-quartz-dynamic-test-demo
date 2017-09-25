@@ -20,5 +20,14 @@ public class DemoJobDetail implements Job{
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         System.out.println("DemoJobDetail.run..");
         demoService.printNowTime();
+        String sleep = jobExecutionContext.getJobDetail().getJobDataMap().getString("sleep");
+        try {
+            if(sleep!=null){
+                Thread.sleep(Long.parseLong(sleep));
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
+    
 }

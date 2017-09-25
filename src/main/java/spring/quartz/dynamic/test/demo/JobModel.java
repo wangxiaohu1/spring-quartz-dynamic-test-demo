@@ -1,4 +1,7 @@
 package spring.quartz.dynamic.test.demo;
+
+import org.quartz.Job;
+
 /**
  * 存放任务的对象
  * 
@@ -8,6 +11,7 @@ package spring.quartz.dynamic.test.demo;
 public class JobModel {
     private String jobId;
     private String jobName;
+    private String jobClass;
     private String jobGroup;
     private String cronExpression;
     private String state;
@@ -23,6 +27,13 @@ public class JobModel {
     }
     public void setJobName(String jobName) {
         this.jobName = jobName;
+    }
+    
+    public String getJobClass() {
+        return jobClass;
+    }
+    public void setJobClass(String jobClass) {
+        this.jobClass = jobClass;
     }
     public String getJobGroup() {
         return jobGroup;
